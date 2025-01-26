@@ -16,11 +16,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Table(name: 'product_variant_value')]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Post(),
-        new Get(),
-        new Put(),
-        new Delete(),
+        new GetCollection(
+            security: "is_granted('PUBLIC_ACCESS')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Get(
+            security: "is_granted('PUBLIC_ACCESS')"
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
     ],
     normalizationContext: ['groups' => ['product_variant_value:read']],
     denormalizationContext: ['groups' => ['product_variant_value:write']]

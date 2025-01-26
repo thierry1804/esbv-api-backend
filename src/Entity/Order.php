@@ -18,11 +18,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Table(name: '`order`')]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Post(),
-        new Get(),
-        new Put(),
-        new Delete(),
+        new GetCollection(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_USER')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_ADMIN') or (is_granted('ROLE_USER') and object.customerEmail == user.email)"
+        ),
+        new Put(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
+        new Delete(
+            security: "is_granted('ROLE_ADMIN')"
+        ),
     ],
     normalizationContext: ['groups' => ['order:read']],
     denormalizationContext: ['groups' => ['order:write']]

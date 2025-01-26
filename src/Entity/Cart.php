@@ -18,11 +18,21 @@ use Symfony\Component\Serializer\Annotation\Groups;
 #[ORM\Table(name: 'cart')]
 #[ApiResource(
     operations: [
-        new GetCollection(),
-        new Post(),
-        new Get(),
-        new Put(),
-        new Delete(),
+        new GetCollection(
+            security: "is_granted('ROLE_USER')"
+        ),
+        new Post(
+            security: "is_granted('ROLE_USER')"
+        ),
+        new Get(
+            security: "is_granted('ROLE_USER') and object.sessionId == user.getId()"
+        ),
+        new Put(
+            security: "is_granted('ROLE_USER') and object.sessionId == user.getId()"
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER') and object.sessionId == user.getId()"
+        ),
     ],
     normalizationContext: ['groups' => ['cart:read']],
     denormalizationContext: ['groups' => ['cart:write']]
