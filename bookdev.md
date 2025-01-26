@@ -10,6 +10,7 @@ L'API est construite avec Symfony 6.4 et API Platform, suivant les principes RES
 - DataProvider/DataPersister : Personnalisation des opérations CRUD
 - EventListeners & Subscribers : Gestion des événements
 - Security : Gestion des authentifications et validations
+- JWT : Authentification par token
 
 ## Structure des Dossiers
 
@@ -18,7 +19,9 @@ esbv-api-backend/
 ├── bin/
 ├── config/
 │   ├── packages/
-│   │   └── api_platform/
+│   │   ├── api_platform/
+│   │   ├── lexik_jwt_authentication/
+│   │   └── security/
 │   ├── routes/
 │   └── services.yaml
 ├── migrations/
@@ -40,6 +43,70 @@ esbv-api-backend/
     ├── cache/
     └── log/
 ```
+
+## Authentification et Sécurité
+
+### Configuration JWT
+L'authentification utilise les JSON Web Tokens (JWT) via le bundle LexikJWTAuthenticationBundle.
+
+#### Génération des Clés
+```bash
+php bin/console lexik:jwt:generate-keypair
+```
+
+#### Configuration JWT
+La configuration se trouve dans `config/packages/lexik_jwt_authentication.yaml` :
+```yaml
+lexik_jwt_authentication:
+    secret_key: '%kernel.project_dir%/config/jwt/private.pem'
+    public_key: '%kernel.project_dir%/config/jwt/public.pem'
+    token_ttl: 3600
+```
+
+### Endpoint d'Authentification
+
+#### Login Check
+- URL : `/api/login_check`
+- Méthode : POST
+- Corps de la requête :
+```json
+{
+    "email": "user@example.com",
+    "password": "password123"
+}
+```
+- Réponse :
+```json
+{
+    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9...",
+    "user": {
+        "email": "user@example.com",
+        "roles": ["ROLE_USER"]
+    }
+}
+```
+
+### Sécurité des Routes
+
+Les routes sont sécurisées selon les rôles suivants :
+
+#### Accès Public
+- Documentation API (`/api/docs`)
+- Login (`/api/login_check`)
+- Lecture des produits et catégories
+- Création de contacts
+
+#### Accès Authentifié (ROLE_USER)
+- Gestion du panier
+- Création de commandes
+- Modification du profil utilisateur
+
+#### Accès Admin (ROLE_ADMIN)
+- Gestion des produits
+- Gestion des catégories
+- Gestion des configurations
+- Lecture des contacts
+- Gestion des utilisateurs
 
 ## API Platform
 
